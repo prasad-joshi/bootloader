@@ -1,8 +1,8 @@
 .file "print_bios.S"
 
 .section .data
-.hex_str:
-	.ascii "Hello, World!\n"
+hex_str:
+	.ascii "xxxxxxxxxxxxxxxx"
 	.set   hex_size, .-hex_str
 
 .section .text

@@ -41,15 +41,56 @@ hex_to_string:
 	jne .L1
 
 	/* if (count > size) { return -1; } */
-	movq %rcx, -0x4(%rbp)
-	cmpq %rcx, 0x12(%rbp)
+	movq %rcx, -0x8(%rbp)
+	cmpq %rcx, 0x10(%rbp)
 	jg .ERROR
 
+	/* hex_string[count] = 0 */
+	movq -0x8(%rbp), %rdx
+	mov 0x10(%rbp), rax
+	add %rdx, %rax
+	movb $0, (%rax)
+
+	/* c-- */
+	subq $0x1, -0x8(%rbp)
+
+	jmp
+
+	movq 8(%rbp), rdx	/* rdx = hex_number */
+	movq -8(%rbp), rcx	/* rcx = count */
+
+.L3:
+	/* byte = hex_number & 0xf */
+	mov %rdx, %rax
+	and $0xf, %rax
+	mov %rax, -0x10(%rbp)
+	mov %rax, %rbx
+
+	/*
+	 * if (byte >= 0 && byte <= 0x9) {
+	 *     hex_string[c] = '0' + byte
+	 * }
+	 */
+
+	mov %rbx, %rax
+	cmpq $0x0, %rax
+	js
+	mov %rbx, %rax
+	cmpq $0x9, %rax
+	jg
+
+	addq $0x30, %rbx	/* rbx += '0' */
+	mov %rcx, %rbx		/* rbx = rcx = count */
+	mov 0x10(%rbp), rax	/* rax = hex_string */
+	add %rbx, %rax		/* rax = hex_string + count */
+	movq (%rax), 
+:
+	/* while (hex_number >=0 && count > 0) */
 .out:
-	movq $0, %rax
+	movq $0, %eax
 	ret
 .ERROR:
-	movq $-1, %rax
+	movq $0xffffffff, %eax
 	ret
 
 	.global _start
